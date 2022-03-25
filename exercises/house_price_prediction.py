@@ -9,6 +9,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
 import plotly.io as pio
+import matplotlib.pyplot as plt
 
 pio.templates.default = "simple_white"
 
@@ -26,16 +27,39 @@ def load_data(filename: str):
     Design matrix and response vector (prices) - either as a single
     DataFrame or a Tuple[DataFrame, Series]
     """
+
     # Loading the data
     data = pd.read_csv(filename)
 
     # labels column
     labels = data.loc[:, "price"]
 
-    # Removing the unnecessary columns columns
+    # Removing the unnecessary columns
     relevant_features = data.drop(columns=["id", "date", "price", "zipcode", "lat", "long"])
-    return relevant_features
-    # raise NotImplementedError()
+
+    # Rounding bathrooms column
+    feature = data.loc[:, "bathrooms"].round()
+    relevant_features = relevant_features.drop(columns=["bathrooms"])
+    relevant_features.insert(4, "bathrooms", feature)
+
+    # Rounding floors column
+    feature = data.loc[:, "floors"].round()
+    relevant_features = relevant_features.drop(columns=["floors"])
+    relevant_features.insert(7, "floors", feature)
+
+    # Making view column binary
+    # feature = data.loc[:, "view"]
+    # feature = feature.where(feature == 0, 1)
+    # relevant_features = relevant_features.drop(columns=["view"])
+    # relevant_features.insert(1, "view", feature)
+
+    # Making renovation column binary
+    feature = data.loc[:, "yr_renovated"]
+    feature = feature.where(feature == 0, 1)
+    relevant_features = relevant_features.drop(columns=["yr_renovated"])
+    relevant_features.insert(1, "yr_renovated", feature)
+
+    return relevant_features, labels
 
 
 def feature_evaluation(X: pd.DataFrame, y: pd.Series, output_path: str = ".") -> NoReturn:
@@ -55,20 +79,33 @@ def feature_evaluation(X: pd.DataFrame, y: pd.Series, output_path: str = ".") ->
     output_path: str (default ".")
         Path to folder in which plots are saved
     """
-    pearson_correlation = np.cov(X, y) / (np.std(X) * np.std(y))
-    return pearson_correlation
-    # raise NotImplementedError()
+
+    for (columnName, columnData) in X.iteritems():
+        col_arr = columnData.to_numpy()
+        pearson_correlation = (np.cov(col_arr, y.to_numpy()) / (np.std(col_arr) * np.std(y)))[0][0]
+        plot = plt.figure()
+        plt.scatter(col_arr, y.to_numpy())
+        plt.xlabel(str(columnName))
+        plt.ylabel('response')
+        plt.title(
+            'the Pearson Correlation between ' + str(columnName) + ' and the house pricing is: ' + str(pearson_correlation))
+        # plt.show()
+        plt.savefig(output_path+'correspondence_with_'+str(columnName)+'.png')
+        plt.close(plot)
+
+    # plt.show()
 
 
 if __name__ == '__main__':
     np.random.seed(0)
+
     # Question 1 - Load and preprocessing of housing prices dataset
-    #data_set = load_data(os.path.join(os.path.abspath(os.curdir("../../..")), '/datasets',
-    #                                  "house_prices.csv"))
-    data_set = load_data("M:\IML\IMLRepository\IML.HUJI\datasets\house_prices.csv")
+    os.chdir('..')
+    data_frame, labels = load_data(os.path.join(os.path.join(os.getcwd(), 'datasets'), 'house_prices.csv'))
 
     # Question 2 - Feature evaluation with respect to response
-    #feature1 = data_set(columns=)
+    feature_evaluation(data_frame, labels)
+    raise NotImplementedError()
 
     # Question 3 - Split samples into training- and testing sets.
     raise NotImplementedError()
