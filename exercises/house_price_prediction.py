@@ -1,3 +1,5 @@
+import os
+
 from IMLearn.utils import split_train_test
 from IMLearn.learners.regressors import LinearRegression
 
@@ -7,6 +9,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
 import plotly.io as pio
+
 pio.templates.default = "simple_white"
 
 
@@ -23,7 +26,16 @@ def load_data(filename: str):
     Design matrix and response vector (prices) - either as a single
     DataFrame or a Tuple[DataFrame, Series]
     """
-    raise NotImplementedError()
+    # Loading the data
+    data = pd.read_csv(filename)
+
+    # labels column
+    labels = data.loc[:, "price"]
+
+    # Removing the unnecessary columns columns
+    relevant_features = data.drop(columns=["id", "date", "price", "zipcode", "lat", "long"])
+    return relevant_features
+    # raise NotImplementedError()
 
 
 def feature_evaluation(X: pd.DataFrame, y: pd.Series, output_path: str = ".") -> NoReturn:
@@ -43,16 +55,20 @@ def feature_evaluation(X: pd.DataFrame, y: pd.Series, output_path: str = ".") ->
     output_path: str (default ".")
         Path to folder in which plots are saved
     """
-    raise NotImplementedError()
+    pearson_correlation = np.cov(X, y) / (np.std(X) * np.std(y))
+    return pearson_correlation
+    # raise NotImplementedError()
 
 
 if __name__ == '__main__':
     np.random.seed(0)
     # Question 1 - Load and preprocessing of housing prices dataset
-    raise NotImplementedError()
+    #data_set = load_data(os.path.join(os.path.abspath(os.curdir("../../..")), '/datasets',
+    #                                  "house_prices.csv"))
+    data_set = load_data("M:\IML\IMLRepository\IML.HUJI\datasets\house_prices.csv")
 
     # Question 2 - Feature evaluation with respect to response
-    raise NotImplementedError()
+    #feature1 = data_set(columns=)
 
     # Question 3 - Split samples into training- and testing sets.
     raise NotImplementedError()
