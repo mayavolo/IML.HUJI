@@ -108,7 +108,7 @@ if __name__ == '__main__':
     X, y = load_data(os.path.join(os.path.join(os.getcwd(), 'datasets'), 'house_prices.csv'))
 
     # Question 2 - Feature evaluation with respect to response
-    # feature_evaluation(data_frame, labels) #TODO Uncomment
+    feature_evaluation(X, y)
 
     # Question 3 - Split samples into training- and testing sets.
     train_x, train_y, test_x, test_y = split_train_test(X, y, 0.75)

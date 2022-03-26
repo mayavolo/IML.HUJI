@@ -37,11 +37,11 @@ class PolynomialFitting(BaseEstimator):
             Responses of input data to fit to
         """
 
-        # Calculating Vandermonde matrix of samples
-        vandermonde_mat = np.polynomial.polynomial.polyvander(X, self.degree)
+        vandermonde_mat = self.__transform(np.ravel(X))
 
         # Calculating coefficients vector w
-        self.coefs_ = np.matmul(np.matmul(np.linalg.inv(np.matmul(np.transpose(vandermonde_mat), vandermonde_mat)), np.transpose(vandermonde_mat)), y)
+        self.coefs_ = np.transpose(np.array([np.matmul(np.matmul(np.linalg.inv(np.matmul(np.transpose(vandermonde_mat), vandermonde_mat)),
+                                          np.transpose(vandermonde_mat)), y)]))
 
     def _predict(self, X: np.ndarray) -> np.ndarray:
         """
@@ -58,7 +58,7 @@ class PolynomialFitting(BaseEstimator):
             Predicted responses of given samples
         """
         # Predicting by multiplying coefficients vector w by input data
-        return np.matmul(self.coefs_, X)
+        return np.matmul(self.coefs_, np.transpose(X))
 
     def _loss(self, X: np.ndarray, y: np.ndarray) -> float:
         """
@@ -81,7 +81,7 @@ class PolynomialFitting(BaseEstimator):
 
     def __transform(self, X: np.ndarray) -> np.ndarray:
         """
-        Transform given input according to the univariate polynomial transformation
+        Transform given input according to the uni-variate polynomial transformation
 
         Parameters
         ----------
@@ -94,6 +94,4 @@ class PolynomialFitting(BaseEstimator):
         """
 
         # Returning Vandermonde matrix of samples
-        return np.polynomial.polynomial.polyvander(X, self.degree)
-
-
+        return np.vander(X, self.degree)
