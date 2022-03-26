@@ -33,11 +33,15 @@ def load_data(filename: str):
     # Loading the data
     data = pd.read_csv(filename)
 
+    data = data.dropna()
+
     # labels column
     labels = data.loc[:, "price"]
 
     # Removing the unnecessary columns
     relevant_features = data.drop(columns=["id", "date", "price", "zipcode", "lat", "long"])
+
+
 
     # Rounding bathrooms column
     feature = data.loc[:, "bathrooms"].round()
@@ -135,14 +139,14 @@ if __name__ == '__main__':
             train_y_samples_labels = train_y_samples_labels.to_numpy()
 
             # Normalize
-            train_x_mean = np.mean(train_x_sampled_rows)
-            train_x_std = np.std(train_x_sampled_rows)
-
-            train_y_mean = np.mean(train_y_samples_labels)
-            train_y_std = np.std(train_y_samples_labels)
-
-            train_x_sampled_rows = (train_x_sampled_rows - train_x_mean) / train_x_std
-            train_y_samples_labels = (train_y_samples_labels - train_y_mean) / train_y_std
+            # train_x_mean = np.mean(train_x_sampled_rows)
+            # train_x_std = np.std(train_x_sampled_rows)
+            #
+            # train_y_mean = np.mean(train_y_samples_labels)
+            # train_y_std = np.std(train_y_samples_labels)
+            #
+            # train_x_sampled_rows = (train_x_sampled_rows - train_x_mean) / train_x_std
+            # train_y_samples_labels = (train_y_samples_labels - train_y_mean) / train_y_std
             # reshape y
             train_y_samples_labels_array = np.reshape(train_y_samples_labels, (train_y_samples_labels.size, 1))
             # Fitting

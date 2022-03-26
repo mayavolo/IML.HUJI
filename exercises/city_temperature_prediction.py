@@ -74,6 +74,7 @@ if __name__ == '__main__':
     plt.show()
 
     # Question 3 - Exploring differences between countries
+    labels_grouped_by_month = X.groupby()
     raise NotImplementedError()
 
     # Question 4 - Fitting model for different values of `k`
