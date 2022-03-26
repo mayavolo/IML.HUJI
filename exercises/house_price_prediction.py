@@ -79,18 +79,22 @@ def feature_evaluation(X: pd.DataFrame, y: pd.Series, output_path: str = ".") ->
     output_path: str (default ".")
         Path to folder in which plots are saved
     """
-
+    # Iteration over every feature in the data set
     for (columnName, columnData) in X.iteritems():
         col_arr = columnData.to_numpy()
+        # Calculating the Pearson Correlation
         pearson_correlation = (np.cov(col_arr, y.to_numpy()) / (np.std(col_arr) * np.std(y)))[0][0]
+
+        # Plotting the scatter
         plot = plt.figure()
         plt.scatter(col_arr, y.to_numpy())
         plt.xlabel(str(columnName))
         plt.ylabel('response')
         plt.title(
-            'the Pearson Correlation between ' + str(columnName) + ' and the house pricing is: ' + str(pearson_correlation))
+            'the Pearson Correlation between ' + str(columnName) + ' and the house pricing is: ' + str(
+                pearson_correlation))
         # plt.show()
-        plt.savefig(output_path+'correspondence_with_'+str(columnName)+'.png')
+        plt.savefig(output_path + 'correspondence_with_' + str(columnName) + '.png')
         plt.close(plot)
 
     # plt.show()
@@ -105,7 +109,7 @@ if __name__ == '__main__':
 
     # Question 2 - Feature evaluation with respect to response
     feature_evaluation(data_frame, labels)
-    raise NotImplementedError()
+    # raise NotImplementedError()
 
     # Question 3 - Split samples into training- and testing sets.
     raise NotImplementedError()

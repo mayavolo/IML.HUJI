@@ -33,7 +33,10 @@ def split_train_test(X: pd.DataFrame, y: pd.Series, train_proportion: float = .2
         Responses of test samples
 
     """
-    raise NotImplementedError()
+    # Number of features to keep from the data frame.
+    number_of_features = np.ceil(X.shape[0] *train_proportion)
+
+    # raise NotImplementedError()
 
 
 def confusion_matrix(a: np.ndarray, b: np.ndarray) -> np.ndarray:
