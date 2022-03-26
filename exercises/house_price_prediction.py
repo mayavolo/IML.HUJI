@@ -13,7 +13,6 @@ import matplotlib.pyplot as plt
 
 pio.templates.default = "simple_white"
 
-
 def load_data(filename: str):
     """
     Load house prices dataset and preprocess data.
@@ -46,12 +45,6 @@ def load_data(filename: str):
     feature = data.loc[:, "floors"].round()
     relevant_features = relevant_features.drop(columns=["floors"])
     relevant_features.insert(7, "floors", feature)
-
-    # Making view column binary
-    # feature = data.loc[:, "view"]
-    # feature = feature.where(feature == 0, 1)
-    # relevant_features = relevant_features.drop(columns=["view"])
-    # relevant_features.insert(1, "view", feature)
 
     # Making renovation column binary
     feature = data.loc[:, "yr_renovated"]
@@ -105,14 +98,13 @@ if __name__ == '__main__':
 
     # Question 1 - Load and preprocessing of housing prices dataset
     os.chdir('..')
-    data_frame, labels = load_data(os.path.join(os.path.join(os.getcwd(), 'datasets'), 'house_prices.csv'))
+    X, y = load_data(os.path.join(os.path.join(os.getcwd(), 'datasets'), 'house_prices.csv'))
 
     # Question 2 - Feature evaluation with respect to response
-    feature_evaluation(data_frame, labels)
-    # raise NotImplementedError()
+    # feature_evaluation(data_frame, labels) #TODO Uncomment
 
     # Question 3 - Split samples into training- and testing sets.
-    raise NotImplementedError()
+    train_x, train_y, test_x, test_y = split_train_test(X, y, 0.75)
 
     # Question 4 - Fit model over increasing percentages of the overall training data
     # For every percentage p in 10%, 11%, ..., 100%, repeat the following 10 times:
@@ -121,4 +113,18 @@ if __name__ == '__main__':
     #   3) Test fitted model over test set
     #   4) Store average and variance of loss over test set
     # Then plot average loss as function of training size with error ribbon of size (mean-2*std, mean+2*std)
-    raise NotImplementedError()
+
+    percent_range = np.arange(10, 100, 1)
+    lini = LinearRegression()
+    mean_loss_array = []
+    for percent in percent_range:
+        mean_loss_sum = 0
+        number_of_samples = np.ceil(train_x.shape[0] * (percent / 100)).astype(int)
+        train_x_sampled_rows = train_x.sample(n=number_of_samples)
+        train_y_samples_labels = train_y.loc[train_x_sampled_rows.index]
+        for i in range(10):
+            lini.fit(train_x_sampled_rows.to_numpy(), train_y_samples_labels.to_numpy())
+            # summation of the mean losses
+            mean_loss_sum += lini.loss(train_x_sampled_rows.to_numpy(), train_y_samples_labels.to_numpy())
+        mean_loss_array.append(mean_loss_sum / 10.0)  # average mean loss
+
