@@ -51,7 +51,7 @@ class LinearRegression(BaseEstimator):
         Fits model with or without an intercept depending on value of `self.include_intercept_`
         """
         if self.include_intercept_:
-            X = np.hstack((np.ones((1, X.shape[0])), X))
+            X = np.hstack((np.ones((X.shape[0], 1)), X))
         self.coefs_ = np.matmul(np.matmul(np.linalg.inv(np.matmul(np.transpose(X), X)), np.transpose(X)), y)
         # raise NotImplementedError()
 
@@ -70,7 +70,9 @@ class LinearRegression(BaseEstimator):
             Predicted responses of given samples
         """
         # raise NotImplementedError()
-        return np.matmul(self.coefs_, X)
+        if self.include_intercept_:
+            X = np.hstack((np.ones((X.shape[0], 1)), X))
+        return np.matmul(X, self.coefs_)
 
     def _loss(self, X: np.ndarray, y: np.ndarray) -> float:
         """

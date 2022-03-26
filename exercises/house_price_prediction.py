@@ -11,7 +11,10 @@ import plotly.express as px
 import plotly.io as pio
 import matplotlib.pyplot as plt
 
+from utils import animation_to_gif
+
 pio.templates.default = "simple_white"
+
 
 def load_data(filename: str):
     """
@@ -114,17 +117,58 @@ if __name__ == '__main__':
     #   4) Store average and variance of loss over test set
     # Then plot average loss as function of training size with error ribbon of size (mean-2*std, mean+2*std)
 
-    percent_range = np.arange(10, 100, 1)
+    percent_range = np.arange(10, 101, 1)
     lini = LinearRegression()
     mean_loss_array = []
+    mean_std_array = []
     for percent in percent_range:
-        mean_loss_sum = 0
+        current_loss_means = []
+        # mean_loss_sum = 0
         number_of_samples = np.ceil(train_x.shape[0] * (percent / 100)).astype(int)
-        train_x_sampled_rows = train_x.sample(n=number_of_samples)
-        train_y_samples_labels = train_y.loc[train_x_sampled_rows.index]
         for i in range(10):
-            lini.fit(train_x_sampled_rows.to_numpy(), train_y_samples_labels.to_numpy())
-            # summation of the mean losses
-            mean_loss_sum += lini.loss(train_x_sampled_rows.to_numpy(), train_y_samples_labels.to_numpy())
-        mean_loss_array.append(mean_loss_sum / 10.0)  # average mean loss
+            # Sampling
+            train_x_sampled_rows = train_x.sample(n=number_of_samples)
+            train_y_samples_labels = train_y.loc[train_x_sampled_rows.index]
 
+            # Converting to numpy array
+            train_x_sampled_rows = train_x_sampled_rows.to_numpy()
+            train_y_samples_labels = train_y_samples_labels.to_numpy()
+
+            # Normalize
+            train_x_mean = np.mean(train_x_sampled_rows)
+            train_x_std = np.std(train_x_sampled_rows)
+
+            train_y_mean = np.mean(train_y_samples_labels)
+            train_y_std = np.std(train_y_samples_labels)
+
+            train_x_sampled_rows = (train_x_sampled_rows - train_x_mean) / train_x_std
+            train_y_samples_labels = (train_y_samples_labels - train_y_mean) / train_y_std
+            # reshape y
+            train_y_samples_labels_array = np.reshape(train_y_samples_labels, (train_y_samples_labels.size, 1))
+            # Fitting
+            lini.fit(train_x_sampled_rows, train_y_samples_labels_array)
+
+            # sum of the mean losses
+            mean_loss = lini.loss(train_x_sampled_rows, train_y_samples_labels_array)
+            current_loss_means.append(mean_loss)
+
+        np_array_mean_loss = np.array(current_loss_means)
+        mean_std_array.append(np.std(current_loss_means))
+        mean_loss_array.append(np.sum(np_array_mean_loss) / 10.0)  # average mean loss
+
+    # plotting
+    percent_range = np.array(percent_range)
+    mean_loss_array = np.array(mean_loss_array)
+    mean_std_array = np.array(mean_std_array)
+    # Plot the mean losses
+    plot = plt.figure()
+
+    plt.xlabel('Percent')
+    plt.ylabel('Mean loss')
+    plt.title("the mean loss as a function of the percent")
+
+    confidence_interval_up = mean_loss_array + 2 * mean_std_array
+    confidence_interval_bottom = mean_loss_array - 2 * mean_std_array
+    plt.fill_between(percent_range, confidence_interval_bottom, confidence_interval_up, alpha=0.2)
+    plt.plot(percent_range, mean_loss_array, '-', color='tab:brown')
+    plt.show()
