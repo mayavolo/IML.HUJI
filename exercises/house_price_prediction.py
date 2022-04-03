@@ -6,12 +6,9 @@ from IMLearn.learners.regressors import LinearRegression
 from typing import NoReturn
 import numpy as np
 import pandas as pd
-import plotly.graph_objects as go
-import plotly.express as px
 import plotly.io as pio
 import matplotlib.pyplot as plt
 
-from utils import animation_to_gif
 
 pio.templates.default = "simple_white"
 
@@ -40,8 +37,6 @@ def load_data(filename: str):
 
     # Removing the unnecessary columns
     relevant_features = data.drop(columns=["id", "date", "price", "zipcode", "lat", "long"])
-
-
 
     # Rounding bathrooms column
     feature = data.loc[:, "bathrooms"].round()
@@ -169,10 +164,10 @@ if __name__ == '__main__':
 
     plt.xlabel('Percent')
     plt.ylabel('Mean loss')
-    plt.title("the mean loss as a function of the percent")
+    plt.title("the log mean loss as a function of the sampling percent \n with a confidence interval")
 
-    confidence_interval_up = mean_loss_array + 2 * mean_std_array
-    confidence_interval_bottom = mean_loss_array - 2 * mean_std_array
+    confidence_interval_up = np.log(mean_loss_array) + 2 * np.log(mean_std_array)
+    confidence_interval_bottom = np.log(mean_loss_array) - 2 * np.log(mean_std_array)
     plt.fill_between(percent_range, confidence_interval_bottom, confidence_interval_up, alpha=0.2)
-    plt.plot(percent_range, mean_loss_array, '-', color='tab:brown')
+    plt.plot(percent_range, np.log(mean_loss_array), '-', color='tab:brown')
     plt.show()

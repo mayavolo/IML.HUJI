@@ -113,24 +113,27 @@ if __name__ == '__main__':
     losses = []
     for k in np.arange(1, 11):
         poly = PolynomialFitting(k)
-        poly.fit(np.array([x_train]).transpose(), y_train)
-        losses.append(poly.loss(np.array([x_test]).transpose(), y_test))
+        poly.fit(np.array([x_train]).ravel(), y_train)
+        losses.append(poly.loss(np.array([x_test]).ravel(), y_test))
     print(losses)
     # Plot the losses
     plot = plt.figure(4)
     plt.xlabel('polynomial degree')
     plt.ylabel('loss')
-    plt.title("the loss as a function of the polynomial degree")
-    plt.bar(np.arange(1, 11), losses)
+    plt.title("The log loss as a function of the polynomial degree")
+    plt.bar(np.arange(1, 11), np.log(np.array(losses)))
 
     # Question 5 - Evaluating fitted model on different countries
-    k = 1
+    k = 3  # best polynomial degree
     poly = PolynomialFitting(k)
-    poly.fit(np.array([israel_samples["Day Of Year"].to_numpy()]).transpose(), y.loc[israel_samples["Day Of Year"].index].to_numpy())
-    losses = [poly.loss(np.array([jordan_samples["Day Of Year"].to_numpy()]).transpose(), y.loc[jordan_samples.index].to_numpy()),
-              poly.loss(np.array([the_netherlands_samples["Day Of Year"].to_numpy()]).transpose(), y.loc[the_netherlands_samples["Day Of Year"].index].to_numpy()),
-              poly.loss(np.array([south_africa_samples["Day Of Year"].to_numpy()]).transpose(), y.loc[south_africa_samples["Day Of Year"].index].to_numpy())]
-
+    poly.fit(np.array([israel_samples["Day Of Year"].to_numpy()]).ravel(),
+             y.loc[israel_samples["Day Of Year"].index].to_numpy())
+    losses = [poly.loss(np.array([jordan_samples["Day Of Year"].to_numpy()]).ravel(),
+                        y.loc[jordan_samples.index].to_numpy()),
+              poly.loss(np.array([the_netherlands_samples["Day Of Year"].to_numpy()]).ravel(),
+                        y.loc[the_netherlands_samples["Day Of Year"].index].to_numpy()),
+              poly.loss(np.array([south_africa_samples["Day Of Year"].to_numpy()]).ravel(),
+                        y.loc[south_africa_samples["Day Of Year"].index].to_numpy())]
     plt.figure(5)
     plt.bar(["Jordan", "The Netherlands", "South Africa"], losses)
     plt.xlabel('Countries')

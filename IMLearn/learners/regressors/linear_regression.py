@@ -53,7 +53,7 @@ class LinearRegression(BaseEstimator):
         if self.include_intercept_:
             X = np.hstack((np.ones((X.shape[0], 1)), X))
         self.coefs_ = np.matmul(np.matmul(np.linalg.inv(np.matmul(np.transpose(X), X)), np.transpose(X)), y)
-        # raise NotImplementedError()
+
 
     def _predict(self, X: np.ndarray) -> np.ndarray:
         """
@@ -92,4 +92,3 @@ class LinearRegression(BaseEstimator):
             Performance under MSE loss function
         """
         return mean_square_error(y, self.predict(X))
-        # raise NotImplementedError()
