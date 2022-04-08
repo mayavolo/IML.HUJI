@@ -9,7 +9,6 @@ import pandas as pd
 import plotly.io as pio
 import matplotlib.pyplot as plt
 
-
 pio.templates.default = "simple_white"
 
 
@@ -78,7 +77,8 @@ def feature_evaluation(X: pd.DataFrame, y: pd.Series, output_path: str = ".") ->
     for (columnName, columnData) in X.iteritems():
         col_arr = columnData.to_numpy()
         # Calculating the Pearson Correlation
-        pearson_correlation = (np.cov(col_arr, y.to_numpy()) / (np.std(col_arr) * np.std(y)))[0][0]
+        # pearson_correlation = (np.cov(col_arr, y.to_numpy()) / (np.std(col_arr) * np.std(y)))[0][0]
+        pearson_correlation = (np.cov(col_arr, y.to_numpy())[0, 1] / (np.std(col_arr) * np.std(y)))
 
         # Plotting the scatter
         plot = plt.figure()
