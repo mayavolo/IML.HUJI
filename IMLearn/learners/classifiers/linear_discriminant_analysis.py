@@ -110,14 +110,12 @@ class LDA(BaseEstimator):
             The likelihood for each sample under each of the classes
 
         """
-        # TODO CHECK
         if not self.fitted_:
             raise ValueError("Estimator must first be fitted before calling `likelihood` function")
-        constant = 1 / (np.sqrt(np.power(2 * np.pi, X.shape[0]) * np.linalg.det(self.cov_)))
-        # exp_function_part = np.exp(
-        #     -0.5 * np.matmul(np.transpose(X - self.mu_), np.matmul(np.linalg.inv(self.cov_), (X - self.mu_))))
-        exp_function_part = np.exp(-0.5 * np.transpose(X - self.mu_) @ np.linalg.inv(self.cov_) @ (X - self.mu_))
-        return np.product(constant * exp_function_part)
+
+        return np.exp(
+            np.log(self.classes_) + -0.5 * X.size * np.log(2 * np.pi) + -0.5 * np.log(self.cov_) + -0.5 * np.matmul(
+                np.matmul(X - self.mu_, self._cov_inv), X - self.mu_))
         # raise NotImplementedError()
 
     def _loss(self, X: np.ndarray, y: np.ndarray) -> float:
