@@ -20,6 +20,7 @@ class DecisionStump(BaseEstimator):
     self.sign_: int
         The label to predict for samples where the value of the j'th feature is about the threshold
     """
+
     def __init__(self) -> DecisionStump:
         """
         Instantiate a Decision stump classifier
@@ -39,7 +40,15 @@ class DecisionStump(BaseEstimator):
         y : ndarray of shape (n_samples, )
             Responses of input data to fit to
         """
-        raise NotImplementedError()
+        information_gains = np.zeros(X.shape[1])
+        y_unique, y_counts = np.unique(y, return_counts=True)
+        entropy = -np.sum((y_counts / y.shape[0]) * np.log2(y_counts / y.shape[0]))
+
+        for f_index in range(X.shape[1]):
+            unique, counts = np.unique(X[:, f_index], return_counts=True)
+            counts = np.sum(counts / X.shape[0])
+            information_gains[f_index] = entropy - counts
+        self.j_ = np.argmax(information_gains)  # GAINS GAINS GAINS
 
     def _predict(self, X: np.ndarray) -> np.ndarray:
         """
@@ -63,7 +72,12 @@ class DecisionStump(BaseEstimator):
         Feature values strictly below threshold are predicted as `-sign` whereas values which equal
         to or above the threshold are predicted as `sign`
         """
-        raise NotImplementedError()
+        minus_sign_indices = (X[:, self.j_] < self.threshold_).nonzero()[0]
+        plus_sign_indices = (X[:, self.j_] >= self.threshold_).nonzero()[0]
+        y = np.zeros(X.shape[0])
+        y[minus_sign_indices] = -self.sign_
+        y[plus_sign_indices] = self.sign_
+        return y
 
     def _find_threshold(self, values: np.ndarray, labels: np.ndarray, sign: int) -> float:
         """
@@ -95,7 +109,18 @@ class DecisionStump(BaseEstimator):
         For every tested threshold, values strictly below threshold are predicted as `-sign` whereas values
         which equal to or above the threshold are predicted as `sign`
         """
-        raise NotImplementedError()
+        self.sign_ = sign
+        unique_vals = np.unique(values)
+        losses = np.zeros((unique_vals.shape[0]))
+        for i in range(unique_vals.shape[0]):
+            minus_sign_indices = (values < unique_vals[i]).nonzero()[0]
+            plus_sign_indices = (values >= unique_vals[i]).nonzero()[0]
+            y_pred = np.zeros(values.shape[0])
+            y_pred[minus_sign_indices] = -sign
+            y_pred[plus_sign_indices] = sign
+            losses[i] = np.sum(labels != y_pred)
+        self.threshold_ = unique_vals[np.argmin(losses)]
+        return losses[np.argmin(losses)] / values.shape[0]
 
     def _loss(self, X: np.ndarray, y: np.ndarray) -> float:
         """
@@ -114,4 +139,5 @@ class DecisionStump(BaseEstimator):
         loss : float
             Performance under missclassification loss function
         """
-        raise NotImplementedError()
+        predicted_y = self.predict(X)
+        return np.sum(y != predicted_y) / X.shape[0]

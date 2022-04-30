@@ -1,10 +1,11 @@
 import numpy as np
 from typing import Tuple
-from IMLearn.learners.metalearners.adaboost import AdaBoost
+from IMLearn.metalearners import AdaBoost
 from IMLearn.learners.classifiers import DecisionStump
 from utils import *
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+import matplotlib.pyplot as plt
 
 
 def generate_data(n: int, noise_ratio: float) -> Tuple[np.ndarray, np.ndarray]:
@@ -42,20 +43,34 @@ def fit_and_evaluate_adaboost(noise, n_learners=250, train_size=5000, test_size=
     (train_X, train_y), (test_X, test_y) = generate_data(train_size, noise), generate_data(test_size, noise)
 
     # Question 1: Train- and test errors of AdaBoost in noiseless case
-    raise NotImplementedError()
+    ada_boost = AdaBoost(DecisionStump(), iterations=n_learners)
+    ada_boost.fit(train_X, train_y)
+    training_losses = []
+    test_losses = []
+    for i in range(1, n_learners):
+        training_losses.append(ada_boost.partial_loss(train_X, train_y, i))
+        test_losses.append(ada_boost.partial_loss(train_X, test_y, i))
+    plt.figure(1)
+    plt.plot(np.arange(1, n_learners), training_losses, color='c', label='training')
+    plt.plot(np.arange(1, n_learners), test_losses, color='m', label='test')
+    plt.xlabel("Number of fitted learners")
+    plt.ylabel("Error")
+    plt.title("training and test errors as a function of the number of fitted learners")
+    plt.legend()
+    plt.show()
 
     # Question 2: Plotting decision surfaces
     T = [5, 50, 100, 250]
     lims = np.array([np.r_[train_X, test_X].min(axis=0), np.r_[train_X, test_X].max(axis=0)]).T + np.array([-.1, .1])
-    raise NotImplementedError()
+    # raise NotImplementedError()
 
     # Question 3: Decision surface of best performing ensemble
-    raise NotImplementedError()
+    # raise NotImplementedError()
 
     # Question 4: Decision surface with weighted samples
-    raise NotImplementedError()
+    # raise NotImplementedError()
 
 
 if __name__ == '__main__':
     np.random.seed(0)
-    raise NotImplementedError()
+    fit_and_evaluate_adaboost(0, 10, 5000, 500)
