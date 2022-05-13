@@ -54,7 +54,6 @@ class LinearRegression(BaseEstimator):
             X = np.hstack((np.ones((X.shape[0], 1)), X))
         self.coefs_ = np.matmul(np.matmul(np.linalg.inv(np.matmul(np.transpose(X), X)), np.transpose(X)), y)
 
-
     def _predict(self, X: np.ndarray) -> np.ndarray:
         """
         Predict responses for given samples using fitted estimator
@@ -69,7 +68,6 @@ class LinearRegression(BaseEstimator):
         responses : ndarray of shape (n_samples, )
             Predicted responses of given samples
         """
-        # raise NotImplementedError()
         if self.include_intercept_:
             X = np.hstack((np.ones((X.shape[0], 1)), X))
         return np.matmul(X, self.coefs_)
